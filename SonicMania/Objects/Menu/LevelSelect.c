@@ -98,15 +98,6 @@ void LevelSelect_StageLoad(void)
     LevelSelect->cheatCodePtrs[6] = LevelSelect->cheat_MaxControl;
     LevelSelect->cheatCodePtrs[7] = LevelSelect->cheat_ToggleSuperMusic;
 
-    LevelSelect->checkCheatActivated[0] = LevelSelect_Cheat_RickyMode;
-    LevelSelect->checkCheatActivated[1] = LevelSelect_Cheat_AllEmeralds;
-    LevelSelect->checkCheatActivated[2] = LevelSelect_Cheat_MaxContinues;
-    LevelSelect->checkCheatActivated[3] = LevelSelect_Cheat_SwapGameMode;
-    LevelSelect->checkCheatActivated[4] = LevelSelect_Cheat_UnlockAllMedals;
-    LevelSelect->checkCheatActivated[5] = LevelSelect_Cheat_SuperDash;
-    LevelSelect->checkCheatActivated[6] = LevelSelect_Cheat_MaxControl;
-    LevelSelect->checkCheatActivated[7] = LevelSelect_Cheat_ToggleSuperMusic;
-
     LevelSelect->cheatCodePos[0] = 0;
     LevelSelect->cheatCodePos[1] = 0;
     LevelSelect->cheatCodePos[2] = 0;
@@ -118,13 +109,35 @@ void LevelSelect_StageLoad(void)
 #endif
 }
 
-#if MANIA_USE_PLUS
-void LevelSelect_Cheat_AllEmeralds(void)
-{
-    Music_FadeOut(0.125);
-    RSDK.PlaySfx(LevelSelect->sfxEmerald, false, 255);
+static int already_run = 0;
 
-    for (int32 e = 0; e < 7; ++e) SaveGame_SetEmerald(e);
+void LevelSelect_checkCheatActivated(int32 cheatNumber) {
+    switch (cheatNumber) {
+        case 0: LevelSelect_Cheat_RickyMode(); break;
+        case 1: LevelSelect_superCheatDifferentiator(); already_run = 1; break;
+        case 2: LevelSelect_Cheat_MaxContinues(); break;
+        case 3: LevelSelect_Cheat_SwapGameMode(); break;
+        case 4: LevelSelect_Cheat_UnlockAllMedals(); break;
+        case 5: LevelSelect_Cheat_SuperDash(); break;
+        case 6: LevelSelect_Cheat_MaxControl(); break;
+        case 7: LevelSelect_Cheat_ToggleSuperMusic(); break;
+    }
+}
+
+#if MANIA_USE_PLUS
+void LevelSelect_superCheatDifferentiator(void) {
+    Music_FadeOut(0.125);
+    for (int32 e = 0; e < 7; ++e) {
+        if (already_run) {
+            RSDK.PlaySfx(LevelSelect->sfxContinue, false, 255);
+            Addendum_SetTimeStone(e);
+        }
+        else {
+            Music_FadeOut(0.125);
+            RSDK.PlaySfx(LevelSelect->sfxEmerald, false, 255);
+            SaveGame_SetEmerald(e);
+        }
+    }
 }
 
 void LevelSelect_Cheat_ToggleSuperMusic(void)
@@ -407,7 +420,7 @@ void LevelSelect_State_Navigate(void)
                 else {
                     LevelSelect->cheatCodePos[i]++;
                     if (LevelSelect->cheatCodePtrs[i][LevelSelect->cheatCodePos[i]] == 255) {
-                        LevelSelect->checkCheatActivated[i]();
+                        LevelSelect_checkCheatActivated(i);
                         LevelSelect->cheatCodePos[i] = 0;
                     }
                 }

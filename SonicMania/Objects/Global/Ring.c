@@ -182,7 +182,7 @@ void Ring_Collect(void)
                 foreach_return;
             }
         }
-        else if (self->state != Ring_State_Attracted && player->shield == SHIELD_LIGHTNING
+        else if (self->state != Ring_State_Attracted && (player->shield == SHIELD_LIGHTNING || player->miracleState)
                  && RSDK.CheckObjectCollisionTouchCircle(self, TO_FIXED(80), player, TO_FIXED(1))) {
             self->drawPos.x    = 0;
             self->state        = Ring_State_Attracted;
@@ -699,7 +699,7 @@ void Ring_State_Attracted(void)
     RSDK_THIS(Ring);
 
     EntityPlayer *player = self->storedPlayer;
-    if (player->shield == SHIELD_LIGHTNING) {
+    if (player->shield == SHIELD_LIGHTNING || player->miracleState) {
         int32 startX = self->position.x;
         int32 startY = self->position.y;
 

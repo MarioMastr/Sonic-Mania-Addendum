@@ -39,7 +39,6 @@ struct ObjectLevelSelect {
     uint16 sfxMedalGot;
     int32 *cheatCodePtrs[8];
     int32 cheatCodePos[8];
-    void (*checkCheatActivated[8])(void);
 #else
     STATIC(int32 bgAniDuration, 240);
     int32 bgAniFrame;
@@ -96,9 +95,11 @@ void LevelSelect_EditorLoad(void);
 #endif
 void LevelSelect_Serialize(void);
 
+void LevelSelect_checkCheatActivated(int32 cheatNumber);
+
 // Extra Entity Functions
 #if MANIA_USE_PLUS
-void LevelSelect_Cheat_AllEmeralds(void);
+void LevelSelect_superCheatDifferentiator(void);
 void LevelSelect_Cheat_ToggleSuperMusic(void);
 void LevelSelect_Cheat_MaxContinues(void);
 void LevelSelect_Cheat_MaxControl(void);
